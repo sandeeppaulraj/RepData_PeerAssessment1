@@ -1,0 +1,99 @@
+---
+title: "Activity Monitoring Analysis"
+output: html_document
+---
+The data for this is can be downloaded from the website provided
+
+The variables included in this dataset are:
+
+    steps: Number of steps taking in a 5-minute interval (missing values are coded as NA)
+
+    date: The date on which the measurement was taken in YYYY-MM-DD format
+
+    interval: Identifier for the 5-minute interval in which measurement was taken
+
+The dataset is stored in a comma-separated-value (CSV) file and there are a total of 17,568 observations in this dataset.
+Read in the data. Also we can add a factor variable based on the day of the week. Although this is not really required till the last part of the project. We however, appropriately convert the date.
+
+```{r, echo =TRUE}
+data <-read.csv("activity.csv", sep = ",")
+data$date <- as.Date(data$date, format = "%Y-%m-%d")
+data$day <- weekdays(data$date)
+
+```
+Now calculate the steps based on the day. Use tapply for this.
+After this, calculate the mean and median
+
+
+```{r, echo=TRUE}
+steps <- tapply(data$steps, data$date, sum, na.rm = TRUE)
+hist(steps, breaks= 20, xlab = "Total Steps", col= "Red")
+mean_steps <- mean(steps)
+mean_steps
+median_steps <- median(steps)
+median_steps
+```
+
+We then calculate the mean steps per interval
+
+```{r, echo=TRUE}
+mean_steps_per_interval <- tapply(data$steps, data$interval, mean, na.rm=TRUE)
+```
+Performing some operations on this to gauge some information
+
+```{r, echo=TRUE}
+mean_steps_per_interval
+dim(mean_steps_per_interval)
+names(mean_steps_per_interval)
+```
+PLot based on the avaiable data.
+
+```{r, echo=TRUE}
+plot(names(mean_steps_per_interval), mean_steps_per_interval, type ='l', col = "Red", xlab = "Interval", ylab = "Mean Steps per interval", main = "PLot of Average Steps per interval")
+```
+
+The variable 'mean_steps_per_interval' will have the interval with the maximum number of steps.
+The following can be done to get the interval. I have done it steps by step.
+The interval can be found in 1 command as well. The required interval is 835
+
+```{r, echo=TRUE}
+which.max(mean_steps_per_interval)
+names(which.max(mean_steps_per_interval))
+```
+
+To calculate the number of NAs in the data set, the following was done
+
+```{r, echo=TRUE}
+sum(is.na(data))
+```
+For the next question, i will use the Hmisc library. Please install the package from R Studio.
+
+```{r, echo=TRUE}
+library(Hmisc)
+
+data_fill_na <- data
+data_fill_na$steps <- with(data_fill_na, impute(data_fill_na$steps, mean))
+
+steps_new <- tapply(data_fill_na$steps, data_fill_na$date, sum)
+mean_steps_new <- mean(steps_new)
+mean_steps_new
+median_steps_new <- median(steps_new)
+median_steps_new
+hist(steps_new, breaks= 20, xlab ="Total Steps in the Filled in Data", col= "Red")
+```
+
+After fil in the NA's with the mean, we see that both median and mean for the transformed data have changed to the same value of 10766.19. Both the median and mean have increased.
+
+For the final part of this project we have to create a xyplot. For this we need the lattice library.
+First we make a copy of the filled in data. Then we add a factor based on the day of the week.
+Based on thsi we proceed to make the xyplot
+
+```{r, echo=TRUE}
+data_day <- data_fill_na
+data_day$weekday <- (weekdays(data_fill_na$date) %in% c("Saturday", "Sunday"))
+steps_weekend_yn <- aggregate(steps~interval + weekday, mean, data=data_day)
+xyplot(steps~interval | weekday, data=steps_weekend_yn, type='l', Col="Red", layout=c(1,2), ylab ="No. of Steps", xlab="Interval", main = "Activity Based on Day of Week")
+
+
+
+```
