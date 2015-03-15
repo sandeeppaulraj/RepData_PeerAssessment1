@@ -248,43 +248,14 @@ sum(is.na(data))
 ## [1] 2304
 ```
 For the next question, i will use the Hmisc library. Please install the package from R Studio.
+The impute function will just print out the necessary output to screen. We need to transform the data.
+For this a copy of the data frame is made. Then we use "with" to fill in the missing values
+with the mean using the impute function
 
 
 ```r
 library(Hmisc)
-```
 
-```
-## Warning: package 'Hmisc' was built under R version 3.1.3
-```
-
-```
-## Loading required package: grid
-## Loading required package: lattice
-## Loading required package: survival
-## Loading required package: splines
-## Loading required package: Formula
-```
-
-```
-## Warning: package 'Formula' was built under R version 3.1.3
-```
-
-```
-## Loading required package: ggplot2
-## 
-## Attaching package: 'Hmisc'
-## 
-## The following objects are masked from 'package:plyr':
-## 
-##     is.discrete, summarize
-## 
-## The following objects are masked from 'package:base':
-## 
-##     format.pval, round.POSIXt, trunc.POSIXt, units
-```
-
-```r
 data_fill_na <- data
 data_fill_na$steps <- with(data_fill_na, impute(data_fill_na$steps, mean))
 
