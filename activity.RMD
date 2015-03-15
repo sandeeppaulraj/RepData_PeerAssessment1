@@ -67,6 +67,9 @@ To calculate the number of NAs in the data set, the following was done
 sum(is.na(data))
 ```
 For the next question, i will use the Hmisc library. Please install the package from R Studio.
+The impute function will just print out the necessary output to screen. We need to transform the data.
+For this a copy of the data frame is made. Then we use "with" to fill in the missing values
+with the mean using the impute function
 
 ```{r, echo=TRUE}
 library(Hmisc)
